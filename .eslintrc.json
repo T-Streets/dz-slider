@@ -1,0 +1,21 @@
+{
+  "parser": "babel-eslint",
+  "extends": ["airbnb", "prettier"],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": ["error"],
+    "no-unused-expressions": 0,
+    "react/jsx-filename-extension": 0,
+    "react/destructuring-assignment": 0,
+    "class-methods-use-this": 0,
+    "default-case": 0,
+    "import/no-unresolved": 0,
+    "react/prefer-stateless-function": 0,
+    "no-shadow": 0,
+    "react/no-multi-comp": 0,
+    "import/no-named-as-default": 0,
+    "no-use-before-define": 0,
+    "curly": ["error", "multi-line", "consistent"],
+    "no-underscore-dangle": 0
+  }
+}
