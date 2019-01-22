@@ -4,6 +4,7 @@ const DZSlider = ({ element, styles, arrowOpts, dotOpts }) => {
   const slider = q(element);
   const innerWrapper = q('.dz-slider-inner', slider);
   const images = Array.from(qa('.dz-slider-inner > .slide', slider));
+  console.log(images);
 
   styler([slider], styles);
 
@@ -20,6 +21,7 @@ const DZSlider = ({ element, styles, arrowOpts, dotOpts }) => {
   /**
    * Add the arrow elements and the dots container to the DOM first
    */
+  const dotButtons = images.map(img => '<button class="dz-slider-dot"></button> ');
   const arrowsAndDots = document.createElement('div');
   arrowsAndDots.innerHTML = `<div class="dz-slider-arrow-left">
                                 <img src="" />
@@ -28,8 +30,7 @@ const DZSlider = ({ element, styles, arrowOpts, dotOpts }) => {
                                 <img src="" />
                               </div>
                               <div class="dz-slider-dots-container">
-                                <button class="dz-slider-dot"></button> 
-                                <button class="dz-slider-dot"></button>
+                                ${dotButtons.join('')}
                               </div>`;
 
   const children = Array.from(arrowsAndDots.childNodes);
@@ -78,7 +79,7 @@ const DZSlider = ({ element, styles, arrowOpts, dotOpts }) => {
   ael('click', rightArrow, () => {
     if (state.currentIndex < images.length - 1) {
       setState({
-        translateValue: -(state.translateValue + state.currentSliderWidth),
+        translateValue: state.translateValue - state.currentSliderWidth,
         currentIndex: state.currentIndex + 1
       });
       innerWrapper.style.transform = `translateX(${state.translateValue}px)`;
