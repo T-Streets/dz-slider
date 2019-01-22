@@ -1,16 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="description" content="CHANGE THIS" />
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <meta name="description" content="CHANGE THIS">
-  <title>React component starter</title>
-</head>
+    <style>
+      .dz-slider {
+        overflow: hidden;
+        white-space: nowrap;
+        position: relative;
+        max-width: 100%;
+      }
 
-<body>
-  <div id="app"></div>
-<script type="text/javascript" src="bundle.js"></script></body>
+      .dz-slider > .dz-slider-inner {
+        height: 100%;
+        width: 100%;
+        position: relative;
+      }
 
+      .dz-slider > .dz-slider-inner > .slide {
+        height: 100%;
+        width: 100%;
+        position: relative;
+        display: inline-block;
+      }
+
+      .dz-slider > .dz-slider-arrow-left {
+        position: absolute;
+        top: 50%;
+        cursor: pointer;
+      }
+
+      .dz-slider > .dz-slider-arrow-right {
+        position: absolute;
+        top: 50%;
+        cursor: pointer;
+      }
+
+      .dz-slider > .dz-slider-dots-container {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        z-index: 9999;
+        padding: 5px 0;
+      }
+
+      .dz-slider > .dz-slider-dots-container > .dz-slider-dot {
+        display: inline-block;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div style="margin-top: 100px;"></div>
+
+    <div style="max-width: 700px;margin: 0 auto;">
+      <div class="testimonials dz-slider">
+        <div class="dz-slider-inner">
+          <div
+            class="slide"
+            style="background-image: url('https://s3.us-east-2.amazonaws.com/dzuz14/thumbnails/aurora.jpg'); background-size: cover;"
+          ></div>
+          <div
+            class="slide"
+            style="background-image: url('https://s3.us-east-2.amazonaws.com/dzuz14/thumbnails/canyon.jpg'); background-size: cover;"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 200px;"></div>
+  <script type="text/javascript" src="bundle.js"></script></body>
 </html>
