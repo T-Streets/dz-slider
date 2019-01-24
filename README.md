@@ -12,7 +12,7 @@ Follow these steps to get started developing your own react component:
 - Fork the repo and create a new branch with name of your choosing
 - Source for the module itself will be in `src/lib`
 - To make changes to the demo page, use the files in `src/docs`
-- Please note that the slider has some default styling in the index.html of `src/docs`
+- Please note that the slider has some default styling in the index.html of `src/docs`. You can change it there.
 - `npm run build` before you submit the PR
 
 ## Demo
