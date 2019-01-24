@@ -7,22 +7,45 @@ function DZSlider(options) {
     currentSliderWidth: q(options.element).clientWidth
   };
 
-  this.options = options;
+  this.options = {
+    numSlidesPer: 1,
+    ...options
+  };
 
   this.slider = q(options.element);
   this.innerWrapper = q('.dz-slider-inner', this.slider);
   this.images = Array.from(qa('.dz-slider-inner > .slide', this.slider));
-  this.dotButtons = this.images.map(() => '<button class="dz-slider-dot"></button>');
   this.arrowsAndDots = document.createElement('div');
+  this.dotButtons;
   this.dotsContainer;
   this.dots;
 
+  this.handleNumberOfSlides();
   this.addArrowsAndDots();
   this.applyStyles();
   this.addArrowListeners();
   this.addDotListeners();
   this.addResizeListeners();
 }
+
+/**
+ * Need to handle setting the width of the slides based on config options.
+ * By default, a slide is obviously 100% of the width of the slider.
+ */
+DZSlider.prototype.handleNumberOfSlides = function handleNumberOfSlides() {
+  const { options } = this;
+
+  if (options.numSlidesPer > 1 && Number.isInteger(options.numSlidesPer)) {
+    this.images.forEach(image => {
+      image.style.width = `${this.state.currentSliderWidth / options.numSlidesPer}px`;
+    });
+
+    const slicedImages = this.images.slice(0, Math.ceil(this.images.length / options.numSlidesPer));
+    this.dotButtons = slicedImages.map(() => '<button class="dz-slider-dot"></button>');
+  } else {
+    this.dotButtons = this.images.map(() => '<button class="dz-slider-dot"></button>');
+  }
+};
 
 /**
  * Add the arrows and dots to the DOM, and add them as member variables
@@ -99,7 +122,7 @@ DZSlider.prototype.addArrowListeners = function addArrowListeners() {
   });
 
   ael('click', rightArrow, () => {
-    if (this.state.currentIndex < images.length - 1) {
+    if (this.state.currentIndex < Math.ceil(images.length / this.options.numSlidesPer) - 1) {
       this.setState({
         translateValue: this.state.translateValue - this.state.currentSliderWidth,
         currentIndex: this.state.currentIndex + 1
@@ -199,6 +222,7 @@ DZSlider.prototype.selectActiveDot = function selectActiveDot(i) {
 
 DZSlider.prototype.setState = function setState(args) {
   this.state = { ...this.state, ...args };
+  console.log(this.state);
 };
 
 export default DZSlider;
