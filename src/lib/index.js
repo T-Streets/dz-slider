@@ -1,114 +1,127 @@
 import { q, qa, ael, styler } from './helpers';
 
-const DZSlider = ({ element, styles, arrowOpts, dotOpts }) => {
-  const slider = q(element);
-  const innerWrapper = q('.dz-slider-inner', slider);
-  const images = Array.from(qa('.dz-slider-inner > .slide', slider));
-  console.log(images);
-
-  styler([slider], styles);
-
-  let state = {
+function DZSlider(options) {
+  this.state = {
     translateValue: 0,
     currentIndex: 0,
-    currentSliderWidth: slider.clientWidth
+    currentSliderWidth: q(options.element).clientWidth
   };
 
-  const setState = args => {
-    state = { ...state, ...args };
-  };
+  this.options = options;
 
-  /**
-   * Add the arrow elements and the dots container to the DOM first
-   */
-  const dotButtons = images.map(img => '<button class="dz-slider-dot"></button> ');
-  const arrowsAndDots = document.createElement('div');
-  arrowsAndDots.innerHTML = `<div class="dz-slider-arrow-left">
-                                <img src="" />
-                              </div>
-                              <div class="dz-slider-arrow-right">
-                                <img src="" />
-                              </div>
-                              <div class="dz-slider-dots-container">
-                                ${dotButtons.join('')}
-                              </div>`;
+  this.slider = q(options.element);
+  this.innerWrapper = q('.dz-slider-inner', this.slider);
+  this.images = Array.from(qa('.dz-slider-inner > .slide', this.slider));
+  this.dotButtons = this.images.map(() => '<button class="dz-slider-dot"></button>');
+  this.arrowsAndDots = document.createElement('div');
+  this.dotsContainer;
+  this.dots;
 
-  const children = Array.from(arrowsAndDots.childNodes);
+  this.addArrowsAndDots();
+  this.applyStyles();
+  this.addArrowListeners();
+  this.addDotListeners();
+  this.addResizeListeners();
+}
+
+/**
+ * Add the arrows and dots to the DOM, and add them as member variables
+ */
+DZSlider.prototype.addArrowsAndDots = function addArrowsAndDots() {
+  this.arrowsAndDots.innerHTML = `<div class="dz-slider-arrow-left">
+                                    <img src="" />
+                                  </div>
+                                  <div class="dz-slider-arrow-right">
+                                    <img src="" />
+                                  </div>
+                                  <div class="dz-slider-dots-container">
+                                    ${this.dotButtons.join('')}
+                                  </div>`;
+
+  const children = Array.from(this.arrowsAndDots.childNodes);
 
   children.forEach(child => {
     if (child.nodeName !== '#text') {
-      slider.appendChild(child);
+      this.slider.appendChild(child);
     }
   });
 
-  /**
-   * Now that the arrows and dots have been added, we can start targeting
-   * them and setting the appropriate listeners, styles, etc.
-   */
-  const dotsContainer = q('.dz-slider > .dz-slider-dots-container');
-  const dots = Array.from(qa('.dz-slider-dot', slider));
+  const { arrowOpts } = this.options;
 
+  this.leftArrow = q('.dz-slider-arrow-left > img', this.slider);
+  this.leftArrow.setAttribute('src', arrowOpts.leftArrow.url);
+
+  this.rightArrow = q('.dz-slider-arrow-right > img', this.slider);
+  this.rightArrow.setAttribute('src', arrowOpts.rightArrow.url);
+
+  this.dotsContainer = q('.dz-slider > .dz-slider-dots-container');
+  this.dots = Array.from(qa('.dz-slider-dot', this.slider));
+};
+
+/**
+ * Applies styles to all of the elements
+ */
+DZSlider.prototype.applyStyles = function applyStyles() {
+  const {
+    slider,
+    dotsContainer,
+    dots,
+    leftArrow,
+    rightArrow,
+    options: { baseStyles, dotOpts, arrowOpts }
+  } = this;
+
+  styler([slider], baseStyles);
   styler([dotsContainer], { bottom: dotOpts.yPos });
   styler(dots, { ...dotOpts.styles, backgroundColor: dotOpts.baseColor });
   styler([dots[0]], { backgroundColor: dotOpts.activeColor });
-
-  const leftArrow = q('.dz-slider-arrow-left > img', slider);
-  leftArrow.setAttribute('src', arrowOpts.leftArrow.url);
   styler([leftArrow.parentElement], { left: arrowOpts.leftArrow.pos });
-
-  const rightArrow = q('.dz-slider-arrow-right > img', slider);
-  rightArrow.setAttribute('src', arrowOpts.rightArrow.url);
   styler([rightArrow.parentElement], { right: arrowOpts.rightArrow.pos });
+};
 
-  /**
-   * Arrow functionality.
-   */
+/**
+ * Adds click events listeners for left and right arrows.
+ */
+DZSlider.prototype.addArrowListeners = function addArrowListeners() {
+  const { leftArrow, rightArrow, innerWrapper, images } = this;
+
   ael('click', leftArrow, () => {
-    if (state.currentIndex === 0) {
+    if (this.state.currentIndex === 0) {
       return;
     } else {
-      setState({
-        translateValue: state.translateValue + state.currentSliderWidth,
-        currentIndex: state.currentIndex - 1
+      this.setState({
+        translateValue: this.state.translateValue + this.state.currentSliderWidth,
+        currentIndex: this.state.currentIndex - 1
       });
-      innerWrapper.style.transform = `translateX(${state.translateValue}px)`;
-      selectActiveDot(state.currentIndex);
+      innerWrapper.style.transform = `translateX(${this.state.translateValue}px)`;
+      this.selectActiveDot(this.state.currentIndex);
     }
   });
 
   ael('click', rightArrow, () => {
-    if (state.currentIndex < images.length - 1) {
-      setState({
-        translateValue: state.translateValue - state.currentSliderWidth,
-        currentIndex: state.currentIndex + 1
+    if (this.state.currentIndex < images.length - 1) {
+      this.setState({
+        translateValue: this.state.translateValue - this.state.currentSliderWidth,
+        currentIndex: this.state.currentIndex + 1
       });
-      innerWrapper.style.transform = `translateX(${state.translateValue}px)`;
-      selectActiveDot(state.currentIndex);
+      innerWrapper.style.transform = `translateX(${this.state.translateValue}px)`;
+      this.selectActiveDot(this.state.currentIndex);
     } else {
-      setState({ translateValue: 0, currentIndex: 0 });
+      this.setState({ translateValue: 0, currentIndex: 0 });
       innerWrapper.style.transform = `translateX(0px)`;
-      selectActiveDot(0);
+      this.selectActiveDot(0);
     }
   });
+};
 
-  /**
-   * Dot functionality.
-   */
-  const selectActiveDot = i => {
-    dots.forEach(dot => {
-      dot.style.backgroundColor = dotOpts.baseColor;
-    });
-
-    dots.forEach((dot, _i) => {
-      if (i === _i) dot.style.backgroundColor = dotOpts.activeColor;
-    });
-  };
+DZSlider.prototype.addDotListeners = function addDotListeners() {
+  const { dots, images, innerWrapper } = this;
 
   dots.forEach((dot, i) => {
     ael('click', dot, () => {
       if (
-        (i === 0 && state.currentIndex === 0) ||
-        (i === images.length - 1 && state.currentIndex === images.length - 1)
+        (i === 0 && this.state.currentIndex === 0) ||
+        (i === images.length - 1 && this.state.currentIndex === images.length - 1)
       ) {
         return;
       } else {
@@ -116,52 +129,76 @@ const DZSlider = ({ element, styles, arrowOpts, dotOpts }) => {
         let newTranslateValue = 0;
 
         // Need to go forward
-        if (state.currentIndex < i) {
-          numSlidesAway = i - state.currentIndex;
-          newTranslateValue = state.translateValue + -(numSlidesAway * state.currentSliderWidth);
+        if (this.state.currentIndex < i) {
+          numSlidesAway = i - this.state.currentIndex;
+          newTranslateValue =
+            this.state.translateValue + -(numSlidesAway * this.state.currentSliderWidth);
         }
         // Need to go backward
         else {
-          numSlidesAway = state.currentIndex - i;
+          numSlidesAway = this.state.currentIndex - i;
         }
 
-        setState({ currentIndex: i, translateValue: newTranslateValue });
-        innerWrapper.style.transform = `translateX(${state.translateValue}px)`;
+        this.setState({ currentIndex: i, translateValue: newTranslateValue });
+        innerWrapper.style.transform = `translateX(${this.state.translateValue}px)`;
       }
 
-      selectActiveDot(i);
+      this.selectActiveDot(i);
     });
   });
+};
 
-  /**
-   * Handle resize events
-   */
+DZSlider.prototype.addResizeListeners = function addResizeListeners() {
+  const { slider, innerWrapper } = this;
+
   window.addEventListener('resize', () => {
     const currentSliderWidth = slider.clientWidth;
 
     // We are at the first slide and only want to get the new slider width. Do nothing else.
-    if (state.currentIndex === 0) {
-      return setState({ currentSliderWidth });
+    if (this.state.currentIndex === 0) {
+      return this.setState({ currentSliderWidth });
     }
 
     // The screen is shrinking in size.
-    if (currentSliderWidth < state.currentSliderWidth) {
-      const diff = state.currentSliderWidth - currentSliderWidth;
-      const newTranslateValue = state.translateValue + diff;
+    if (currentSliderWidth < this.state.currentSliderWidth) {
+      const diff = this.state.currentSliderWidth - currentSliderWidth;
+      const newTranslateValue = this.state.translateValue + diff;
 
       innerWrapper.style.transform = `translateX(${newTranslateValue}px)`;
-      return setState({ currentSliderWidth, translateValue: newTranslateValue });
+      return this.setState({ currentSliderWidth, translateValue: newTranslateValue });
     }
 
     // The screen is growing in size.
-    if (currentSliderWidth > state.currentSliderWidth) {
-      const diff = currentSliderWidth - state.currentSliderWidth;
-      const newTranslateValue = state.translateValue - diff;
+    if (currentSliderWidth > this.state.currentSliderWidth) {
+      const diff = currentSliderWidth - this.state.currentSliderWidth;
+      const newTranslateValue = this.state.translateValue - diff;
 
       innerWrapper.style.transform = `translateX(${newTranslateValue}px)`;
-      return setState({ currentSliderWidth, translateValue: newTranslateValue });
+      return this.setState({ currentSliderWidth, translateValue: newTranslateValue });
     }
   });
+};
+
+/**
+ * Changes the clicked dots color to active, and removes active color from all others just in case.
+ */
+DZSlider.prototype.selectActiveDot = function selectActiveDot(i) {
+  const {
+    dots,
+    options: { dotOpts }
+  } = this;
+
+  dots.forEach(dot => {
+    dot.style.backgroundColor = dotOpts.baseColor;
+  });
+
+  dots.forEach((dot, _i) => {
+    if (i === _i) dot.style.backgroundColor = dotOpts.activeColor;
+  });
+};
+
+DZSlider.prototype.setState = function setState(args) {
+  this.state = { ...this.state, ...args };
 };
 
 export default DZSlider;
