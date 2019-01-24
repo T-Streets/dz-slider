@@ -1,6 +1,6 @@
 ## Getting started
 
-Follow these steps to get started developing your own react component:
+Follow these steps:
 
 - `git clone https://github.com/DZuz14/dz-slider.git`
 - `npm i`
