@@ -3,7 +3,7 @@ import DZSlider from '../lib/index';
 window.addEventListener('DOMContentLoaded', () => {
   new DZSlider({
     element: '.testimonials.dz-slider',
-    numSlidesPer: 3,
+    numSlidesPer: 1,
     baseStyles: {
       height: '300px'
     },

@@ -223,7 +223,10 @@ DZSlider.prototype.selectActiveDot = function selectActiveDot(i) {
 
 DZSlider.prototype.setState = function setState(args) {
   this.state = { ...this.state, ...args };
-  console.log(this.state);
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log(this.state);
+  }
 };
 
 export default DZSlider;

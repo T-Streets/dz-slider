@@ -4,7 +4,7 @@
   "description": "sliders are the worst.",
   "main": "lib/index.js",
   "scripts": {
-    "dev": "concurrently \"npm run lib:watch\" \"webpack-dev-server --mode development --open\"",
+    "dev": "NODE_ENV=development concurrently \"npm run lib:watch\" \"webpack-dev-server --mode development --open\"",
     "lib": "babel src/lib -d lib --copy-files",
     "lib:watch": "babel src/lib -w -d lib --copy-files",
     "build": "webpack --mode production"

@@ -3,7 +3,7 @@
 Follow these steps to get started developing your own react component:
 
 - `git clone https://github.com/DZuz14/dz-slider.git`
-- `npm install`
+- `npm i`
 - `npm run dev`
 - Go to http://127.0.0.1:8000 (_If your browser doesnt automatically open for you_)
 
