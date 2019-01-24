@@ -13,6 +13,7 @@ Follow these steps to get started developing your own react component:
 - Source for the module itself will be in `src/lib`
 - To make changes to the demo page, use the files in `src/docs`
 - Please note that the slider has some default styling in the index.html of `src/docs`. You can change it there.
+- Trying issues labeled with `priority` would be preferred, but take whatever you'd like.
 - `npm run build` before you submit the PR
 
 ## Demo
