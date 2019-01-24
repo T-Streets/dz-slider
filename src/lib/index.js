@@ -116,6 +116,7 @@ DZSlider.prototype.addArrowListeners = function addArrowListeners() {
         translateValue: this.state.translateValue + this.state.currentSliderWidth,
         currentIndex: this.state.currentIndex - 1
       });
+
       innerWrapper.style.transform = `translateX(${this.state.translateValue}px)`;
       this.selectActiveDot(this.state.currentIndex);
     }
