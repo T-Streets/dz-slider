@@ -14,3 +14,6 @@ Follow these steps to get started developing your own react component:
 - To make changes to the demo page, use the files in `src/docs`
 - Please note that the slider has some default styling in the index.html of `src/docs`
 - `npm run build` before you submit the PR
+
+## Demo
+[Live Demo](http://danzuzevich.com/dz-slider/)
