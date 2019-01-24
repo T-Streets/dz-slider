@@ -14,18 +14,20 @@ function DZSlider(options) {
 
   this.slider = q(options.element);
   this.innerWrapper = q('.dz-slider-inner', this.slider);
-  this.images = Array.from(qa('.dz-slider-inner > .slide', this.slider));
+  this.slides = Array.from(qa('.dz-slider-inner > .slide', this.slider));
   this.arrowsAndDots = document.createElement('div');
   this.dotButtons;
   this.dotsContainer;
   this.dots;
 
-  this.handleNumberOfSlides();
-  this.addArrowsAndDots();
-  this.applyStyles();
-  this.addArrowListeners();
-  this.addDotListeners();
-  this.addResizeListeners();
+  [
+    'handleNumberOfSlides',
+    'addArrowsAndDots',
+    'applyStyles',
+    'addArrowListeners',
+    'addDotListeners',
+    'addResizeListeners'
+  ].forEach(fn => this[fn]());
 }
 
 /**
@@ -36,14 +38,14 @@ DZSlider.prototype.handleNumberOfSlides = function handleNumberOfSlides() {
   const { options } = this;
 
   if (options.numSlidesPer > 1 && Number.isInteger(options.numSlidesPer)) {
-    this.images.forEach(image => {
-      image.style.width = `${this.state.currentSliderWidth / options.numSlidesPer}px`;
+    this.slides.forEach(slide => {
+      slide.style.width = `${this.state.currentSliderWidth / options.numSlidesPer}px`;
     });
 
-    const slicedImages = this.images.slice(0, Math.ceil(this.images.length / options.numSlidesPer));
-    this.dotButtons = slicedImages.map(() => '<button class="dz-slider-dot"></button>');
+    const slicedslides = this.slides.slice(0, Math.ceil(this.slides.length / options.numSlidesPer));
+    this.dotButtons = slicedslides.map(() => '<button class="dz-slider-dot"></button>');
   } else {
-    this.dotButtons = this.images.map(() => '<button class="dz-slider-dot"></button>');
+    this.dotButtons = this.slides.map(() => '<button class="dz-slider-dot"></button>');
   }
 };
 
@@ -95,9 +97,11 @@ DZSlider.prototype.applyStyles = function applyStyles() {
   } = this;
 
   styler([slider], baseStyles);
+
   styler([dotsContainer], { bottom: dotOpts.yPos });
   styler(dots, { ...dotOpts.styles, backgroundColor: dotOpts.baseColor });
   styler([dots[0]], { backgroundColor: dotOpts.activeColor });
+
   styler([leftArrow.parentElement], { left: arrowOpts.leftArrow.pos });
   styler([rightArrow.parentElement], { right: arrowOpts.rightArrow.pos });
 };
@@ -106,7 +110,7 @@ DZSlider.prototype.applyStyles = function applyStyles() {
  * Adds click events listeners for left and right arrows.
  */
 DZSlider.prototype.addArrowListeners = function addArrowListeners() {
-  const { leftArrow, rightArrow, innerWrapper, images } = this;
+  const { leftArrow, rightArrow, innerWrapper, slides } = this;
 
   ael('click', leftArrow, () => {
     if (this.state.currentIndex === 0) {
@@ -123,29 +127,30 @@ DZSlider.prototype.addArrowListeners = function addArrowListeners() {
   });
 
   ael('click', rightArrow, () => {
-    if (this.state.currentIndex < Math.ceil(images.length / this.options.numSlidesPer) - 1) {
+    if (this.state.currentIndex < Math.ceil(slides.length / this.options.numSlidesPer) - 1) {
       this.setState({
         translateValue: this.state.translateValue - this.state.currentSliderWidth,
         currentIndex: this.state.currentIndex + 1
       });
-      innerWrapper.style.transform = `translateX(${this.state.translateValue}px)`;
+
       this.selectActiveDot(this.state.currentIndex);
+      innerWrapper.style.transform = `translateX(${this.state.translateValue}px)`;
     } else {
       this.setState({ translateValue: 0, currentIndex: 0 });
-      innerWrapper.style.transform = `translateX(0px)`;
       this.selectActiveDot(0);
+      innerWrapper.style.transform = `translateX(0px)`;
     }
   });
 };
 
 DZSlider.prototype.addDotListeners = function addDotListeners() {
-  const { dots, images, innerWrapper } = this;
+  const { dots, slides, innerWrapper } = this;
 
   dots.forEach((dot, i) => {
     ael('click', dot, () => {
       if (
         (i === 0 && this.state.currentIndex === 0) ||
-        (i === images.length - 1 && this.state.currentIndex === images.length - 1)
+        (i === slides.length - 1 && this.state.currentIndex === slides.length - 1)
       ) {
         return;
       } else {
