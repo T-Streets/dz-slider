@@ -166,6 +166,8 @@ DZSlider.prototype.addDotListeners = function addDotListeners() {
         // Need to go backward
         else {
           numSlidesAway = this.state.currentIndex - i;
+          newTranslateValue = 
+            this.state.translateValue + (numSlidesAway * this.state.currentSliderWidth)
         }
 
         this.setState({ currentIndex: i, translateValue: newTranslateValue });
