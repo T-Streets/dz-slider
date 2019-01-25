@@ -127,11 +127,37 @@ DZSlider.prototype.addArrowListeners = function addArrowListeners() {
   });
 
   ael('click', rightArrow, () => {
-    if (this.state.currentIndex < Math.ceil(slides.length / this.options.numSlidesPer) - 1) {
+    let slideRatio = Math.ceil(slides.length / this.options.numSlidesPer) - 1 
+
+    console.log(slideRatio)
+    if (this.state.currentIndex < slideRatio) {
+        if(this.options.numSlidesPer === 1) {
+        this.setState({
+          translateValue: (this.state.translateValue - this.state.currentSliderWidth),
+          currentIndex: this.state.currentIndex + 1
+        });
+      }
+      else if(this.state.currentIndex === slideRatio - 1) {
+        if(this.options.numSlidesPer % 2 === 1) {
+          console.log('fired')
+          this.setState({
+            translateValue: (this.state.translateValue - this.state.currentSliderWidth) / 1.5,
+            currentIndex: this.state.currentIndex + 1
+          }); 
+        } else if (this.options.numSlidesPer % 2 === 0) {
+          console.log('fire2')
+          this.setState({
+            translateValue: (this.state.translateValue - this.state.currentSliderWidth) / 4,
+            currentIndex: this.state.currentIndex + 1
+          })
+        } 
+      } 
+
       this.setState({
-        translateValue: this.state.translateValue - this.state.currentSliderWidth,
+        translateValue: (this.state.translateValue - this.state.currentSliderWidth),
         currentIndex: this.state.currentIndex + 1
       });
+  
 
       this.selectActiveDot(this.state.currentIndex);
       innerWrapper.style.transform = `translateX(${this.state.translateValue}px)`;
@@ -232,7 +258,7 @@ DZSlider.prototype.setState = function setState(args) {
   this.state = { ...this.state, ...args };
 
   if (process.env.NODE_ENV === 'development') {
-    console.log(this.state);
+    console.log(this.state)
   }
 };
 
