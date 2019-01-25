@@ -8,7 +8,9 @@ function DZSlider(options) {
   this.state = {
     translateValue: 0,
     currentIndex: 0,
-    currentSliderWidth: q(options.element).clientWidth
+    currentSliderWidth: q(options.element).clientWidth,
+    hasOddNumberOfSlides: false,
+    endOfSlider: 0
   };
 
   // Merge default options and options supplied by user.
@@ -25,7 +27,13 @@ function DZSlider(options) {
   this.dotsContainer;
   this.dots;
 
-  // Execute all of the methods necessary to bootstrap the slider.
+  if (this.slides.length % 2 > 0) {
+    this.setState({ hasOddNumberOfSlides: true });
+  }
+
+  const endOfSlider = Math.ceil(this.slides.length / this.options.numSlidesPer) - 1;
+  this.setState({ endOfSlider });
+
   ['determineSlidesPerView', 'addElementsToDOM', 'applyStyles', 'addEventListeners'].forEach(fn =>
     this[fn]()
   );
@@ -110,8 +118,8 @@ DZSlider.prototype.goBack = function goBack() {
       translateValue: this.state.translateValue + this.state.currentSliderWidth,
       currentIndex: this.state.currentIndex - 1
     });
-    this.innerWrapper.style.transform = `translateX(${this.state.translateValue}px)`;
     this.selectActiveDot(this.state.currentIndex);
+    this.transformer();
   }
 };
 
@@ -121,18 +129,18 @@ DZSlider.prototype.goBack = function goBack() {
  * We would do: 700 - 700 to yield us 0px.
  */
 DZSlider.prototype.goForward = function goForward() {
-  if (this.state.currentIndex < Math.ceil(this.slides.length / this.options.numSlidesPer) - 1) {
+  if (this.state.currentIndex < this.state.endOfSlider) {
     this.setState({
       translateValue: this.state.translateValue - this.state.currentSliderWidth,
       currentIndex: this.state.currentIndex + 1
     });
 
     this.selectActiveDot(this.state.currentIndex);
-    this.innerWrapper.style.transform = `translateX(${this.state.translateValue}px)`;
+    this.transformer();
   } else {
     this.setState({ translateValue: 0, currentIndex: 0 });
     this.selectActiveDot(0);
-    this.innerWrapper.style.transform = `translateX(0px)`;
+    this.transformer(0);
   }
 };
 
@@ -140,7 +148,7 @@ DZSlider.prototype.goForward = function goForward() {
  * Handles the user clicking a dot
  */
 DZSlider.prototype.handleDotClick = function handleDotClick(e) {
-  const { slides, innerWrapper } = this;
+  const { slides } = this;
   const i = parseInt(e.target.getAttribute('data-index'));
 
   if (
@@ -165,7 +173,7 @@ DZSlider.prototype.handleDotClick = function handleDotClick(e) {
     }
 
     this.setState({ currentIndex: i, translateValue: newTranslateValue });
-    innerWrapper.style.transform = `translateX(${this.state.translateValue}px)`;
+    this.transformer();
   }
 
   this.selectActiveDot(i);
@@ -193,30 +201,50 @@ DZSlider.prototype.selectActiveDot = function selectActiveDot(i) {
  * Handles making sure that the slider adapts to the user changing the size of the screen
  */
 DZSlider.prototype.handleResize = function handleResize() {
-  const { slider, innerWrapper } = this;
-  const currentSliderWidth = slider.clientWidth;
+  const { slider } = this;
+  const newSliderWidth = slider.clientWidth;
 
   // We are at the first slide and only want to get the new slider width. Do nothing else.
   if (this.state.currentIndex === 0) {
     return this.setState({ currentSliderWidth });
   }
 
-  // The screen is shrinking in size.
-  if (currentSliderWidth < this.state.currentSliderWidth) {
-    const diff = this.state.currentSliderWidth - currentSliderWidth;
-    const newTranslateValue = this.state.translateValue + diff;
+  let newTranslateValue = 0;
 
-    innerWrapper.style.transform = `translateX(${newTranslateValue}px)`;
-    return this.setState({ currentSliderWidth, translateValue: newTranslateValue });
+  // The screen is shrinking in size.
+  if (newSliderWidth < this.state.currentSliderWidth) {
+    const diff = this.state.currentSliderWidth - newSliderWidth;
+    newTranslateValue = this.state.translateValue + diff;
   }
 
   // The screen is growing in size.
-  if (currentSliderWidth > this.state.currentSliderWidth) {
-    const diff = currentSliderWidth - this.state.currentSliderWidth;
-    const newTranslateValue = this.state.translateValue - diff;
+  if (newSliderWidth > this.state.currentSliderWidth) {
+    const diff = newSliderWidth - this.state.currentSliderWidth;
+    newTranslateValue = this.state.translateValue - diff;
+  }
 
-    innerWrapper.style.transform = `translateX(${newTranslateValue}px)`;
-    return this.setState({ currentSliderWidth, translateValue: newTranslateValue });
+  this.setState({ currentSliderWidth: newSliderWidth, translateValue: newTranslateValue });
+  this.transformer(newTranslateValue);
+};
+
+/**
+ * Handles literally moving the slider views back and forth. By default if you call
+ * transformer without an argument, it uses the current translate value in state.
+ */
+DZSlider.prototype.transformer = function transformer(value = this.state.translateValue) {
+  if (this.state.hasOddNumberOfSlides && this.options.numSlidesPer > 1) {
+    if (this.state.currentIndex === this.state.endOfSlider) {
+      const numSlidesShown = this.state.currentIndex * this.options.numSlidesPer;
+      const numSlidesNotShown = this.slides.length - numSlidesShown;
+
+      const diff = value + this.state.currentSliderWidth;
+      const additional = numSlidesNotShown * q('.slide').clientWidth;
+      this.innerWrapper.style.transform = `translateX(${diff - additional}px)`;
+    } else {
+      this.innerWrapper.style.transform = `translateX(${value}px)`;
+    }
+  } else {
+    this.innerWrapper.style.transform = `translateX(${value}px)`;
   }
 };
 
@@ -264,3 +292,7 @@ DZSlider.prototype.setState = function setState(args) {
 };
 
 export default DZSlider;
+
+/*
+  - If we are at the end,
+*/
