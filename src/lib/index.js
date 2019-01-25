@@ -11,7 +11,6 @@ function DZSlider(options) {
     currentSliderWidth: q(options.element).clientWidth
   };
 
-  console.log(this.state);
   // Merge default options and options supplied by user.
   this.options = {
     numSlidesPer: 1,
