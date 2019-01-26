@@ -201,26 +201,42 @@ DZSlider.prototype.selectActiveDot = function selectActiveDot(i) {
  * Handles making sure that the slider adapts to the user changing the size of the screen
  */
 DZSlider.prototype.handleResize = function handleResize() {
-  const { slider } = this;
+  const { slider, slides } = this;
   const newSliderWidth = slider.clientWidth;
 
   // We are at the first slide and only want to get the new slider width. Do nothing else.
-  if (this.state.currentIndex === 0) {
-    return this.setState({ currentSliderWidth });
-  }
+  // if (this.state.currentIndex === 0) {
+  //   return this.setState({ currentSliderWidth });
+  // }
 
   let newTranslateValue = 0;
+  let transSliderRatio;
 
   // The screen is shrinking in size.
   if (newSliderWidth < this.state.currentSliderWidth) {
     const diff = this.state.currentSliderWidth - newSliderWidth;
     newTranslateValue = this.state.translateValue + diff;
-  }
+
+    transSliderRatio = Math.floor((newTranslateValue / this.state.currentSliderWidth) * 100)
+
+    if(transSliderRatio > 2) {
+      this.slides.forEach(slide => {
+        slide.style.width = `${this.state.currentSliderWidth - 10}px`
+      })}
+    }
 
   // The screen is growing in size.
   if (newSliderWidth > this.state.currentSliderWidth) {
     const diff = newSliderWidth - this.state.currentSliderWidth;
     newTranslateValue = this.state.translateValue - diff;
+
+    transSliderRatio = Math.floor((newTranslateValue / this.state.currentSliderWidth) * 100)
+    
+    if(transSliderRatio < 2) {
+      this.slides.forEach(slide => {
+        slide.style.width = '350px'
+      })
+    }
   }
 
   this.setState({ currentSliderWidth: newSliderWidth, translateValue: newTranslateValue });
@@ -287,7 +303,7 @@ DZSlider.prototype.setState = function setState(args) {
   this.state = { ...this.state, ...args };
 
   if (process.env.NODE_ENV === 'development') {
-    console.log(this.state);
+    // console.log(this.state);
   }
 };
 
